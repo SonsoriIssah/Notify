@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>New Note — Notify</title>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink: #1a1410;
+      --paper: #f5f0e8;
+      --cream: #ede7d9;
+      --rust: #c4500a;
+      --rust-light: #f0d5c4;
+      --muted: #8a7d6e;
+      --line: rgba(26,20,16,0.12);
+    }
+
+    body {
+      font-family: 'DM Mono', monospace;
+      background: var(--paper);
+      color: var(--ink);
+      min-height: 100vh;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: repeating-linear-gradient(
+        transparent,
+        transparent 31px,
+        var(--line) 31px,
+        var(--line) 32px
+      );
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .page {
+      position: relative;
+      z-index: 1;
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 48px 32px 80px;
+    }
+
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 48px;
+      border-bottom: 2px solid var(--ink);
+      padding-bottom: 16px;
+    }
+
+    .back-link {
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: color 0.15s;
+    }
+
+    .back-link:hover { color: var(--ink); }
+
+    .back-link svg {
+      width: 12px; height: 12px;
+      stroke: currentColor; fill: none;
+      stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+    }
+
+    .page-title {
+      font-family: 'Instrument Serif', serif;
+      font-style: italic;
+      font-size: 18px;
+      color: var(--muted);
+    }
+
+    .field {
+      margin-bottom: 28px;
+    }
+
+    .field-label {
+      font-size: 10px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--muted);
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    .field input[type="text"] {
+      width: 100%;
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid var(--ink);
+      font-family: 'Instrument Serif', serif;
+      font-size: 28px;
+      color: var(--ink);
+      padding: 6px 0;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    .field input[type="text"]::placeholder { color: var(--muted); }
+    .field input[type="text"]:focus { border-color: var(--rust); }
+
+    .field textarea {
+      width: 100%;
+      background: transparent;
+      border: 1px solid var(--line);
+      font-family: 'DM Mono', monospace;
+      font-size: 13px;
+      line-height: 2;
+      color: var(--ink);
+      padding: 16px;
+      outline: none;
+      resize: vertical;
+      min-height: 320px;
+      transition: border-color 0.15s;
+    }
+
+    .field textarea::placeholder { color: var(--muted); }
+    .field textarea:focus { border-color: var(--rust); }
+
+    .actions {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .save-btn {
+      background: var(--ink);
+      color: var(--paper);
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 12px 28px;
+      border: none;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+    }
+
+    .save-btn:hover { background: var(--rust); }
+    .save-btn:active { transform: scale(0.98); }
+
+    .cancel-link {
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+
+    .cancel-link:hover { color: var(--ink); }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="top-bar">
+      <a href="/" class="back-link">
+        <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+        All notes
+      </a>
+      <span class="page-title">New note</span>
+    </div>
+
+    <form action="/create" method="POST">
+      <div class="field">
+        <label class="field-label" for="file_name">Title</label>
+        <input type="text" id="file_name" name="file_name" placeholder="Note title..." required autofocus>
+      </div>
+
+      <div class="field">
+        <label class="field-label" for="content">Content</label>
+        <textarea id="content" name="content" placeholder="Start writing..."></textarea>
+      </div>
+
+      <div class="actions">
+        <button type="submit" class="save-btn">Save note</button>
+        <a href="/" class="cancel-link">Cancel</a>
+      </div>
+    </form>
+  </div>
+</body>
+</html>

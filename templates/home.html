@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Notify</title>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink: #1a1410;
+      --paper: #f5f0e8;
+      --cream: #ede7d9;
+      --rust: #c4500a;
+      --rust-light: #f0d5c4;
+      --muted: #8a7d6e;
+      --line: rgba(26,20,16,0.12);
+    }
+
+    body {
+      font-family: 'DM Mono', monospace;
+      background: var(--paper);
+      color: var(--ink);
+      min-height: 100vh;
+      padding: 0;
+    }
+
+    /* Ruled paper background */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: repeating-linear-gradient(
+        transparent,
+        transparent 31px,
+        var(--line) 31px,
+        var(--line) 32px
+      );
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .page {
+      position: relative;
+      z-index: 1;
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 48px 32px 80px;
+    }
+
+    header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      margin-bottom: 48px;
+      border-bottom: 2px solid var(--ink);
+      padding-bottom: 16px;
+    }
+
+    .logo {
+      font-family: 'Instrument Serif', serif;
+      font-size: 42px;
+      letter-spacing: -1px;
+      line-height: 1;
+    }
+
+    .logo span {
+      color: var(--rust);
+      font-style: italic;
+    }
+
+    .note-count {
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .new-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--ink);
+      color: var(--paper);
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 10px 20px;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.15s, transform 0.1s;
+      margin-bottom: 40px;
+    }
+
+    .new-btn:hover { background: var(--rust); }
+    .new-btn:active { transform: scale(0.98); }
+
+    .new-btn svg {
+      width: 14px; height: 14px;
+      stroke: currentColor; fill: none;
+      stroke-width: 2; stroke-linecap: round;
+    }
+
+    .section-label {
+      font-size: 10px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+
+    .notes-list {
+      list-style: none;
+    }
+
+    .note-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--line);
+      gap: 12px;
+      animation: fadeIn 0.3s ease both;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .note-link {
+      font-family: 'Instrument Serif', serif;
+      font-size: 20px;
+      color: var(--ink);
+      text-decoration: none;
+      flex: 1;
+      transition: color 0.15s;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .note-link:hover { color: var(--rust); }
+
+    .note-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .edit-btn {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-decoration: none;
+      padding: 4px 10px;
+      border: 1px solid var(--line);
+      transition: all 0.15s;
+    }
+
+    .edit-btn:hover {
+      color: var(--ink);
+      border-color: var(--ink);
+    }
+
+    /* Delete form */
+    .delete-form { margin: 0; }
+
+    .delete-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px 6px;
+      color: var(--muted);
+      transition: color 0.15s;
+      display: flex;
+      align-items: center;
+    }
+
+    .delete-btn:hover { color: var(--rust); }
+
+    .delete-btn svg {
+      width: 14px; height: 14px;
+      stroke: currentColor; fill: none;
+      stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+    }
+
+    .empty-state {
+      padding: 48px 0;
+      text-align: center;
+      color: var(--muted);
+    }
+
+    .empty-state p {
+      font-family: 'Instrument Serif', serif;
+      font-style: italic;
+      font-size: 20px;
+      margin-bottom: 8px;
+    }
+
+    .empty-state span {
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <div class="logo">Noti<span>fy</span></div>
+      <div class="note-count">{{ notes|length }} note{% if notes|length != 1 %}s{% endif %}</div>
+    </header>
+
+    <a href="/create" class="new-btn">
+      <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      New note
+    </a>
+
+    {% if notes %}
+      <div class="section-label">Your notes</div>
+      <ul class="notes-list">
+        {% for note in notes %}
+        <li class="note-item" style="animation-delay: {{ loop.index0 * 0.05 }}s">
+          <a href="/edit/{{ note.id }}" class="note-link">{{ note.file_name }}</a>
+          <div class="note-actions">
+            <a href="/edit/{{ note.id }}" class="edit-btn">Edit</a>
+            <form class="delete-form" action="/delete/{{ note.id }}" method="POST">
+              <button class="delete-btn" type="submit" title="Delete note">
+                <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+              </button>
+            </form>
+          </div>
+        </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <div class="empty-state">
+        <p>No notes yet.</p>
+        <span>Click "New note" to get started</span>
+      </div>
+    {% endif %}
+  </div>
+</body>
+</html>
